@@ -5,7 +5,7 @@ services:
     build:
       context: ./gems
       args:
-        REACT_APP_API_BASE: http://backend:4005/api
+        REACT_APP_API_BASE: http://gems-backend:4005/api
     ports:
       - "4004:80"
     depends_on:
