@@ -6,6 +6,22 @@ const router = express.Router();
 const Item = require("../models/item");
 const Product = require("../models/product");
 
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const upload = multer({ dest: '/app' });
+
+app.post('/upload-pdf', upload.single('file'), (req, res) => {
+  const oldPath = req.file.path;
+  const newPath = path.join('/app', req.file.originalname);
+
+  fs.rename(oldPath, newPath, err => {
+    if (err) return res.status(500).send("Failed to save");
+    res.send("Uploaded");
+  });
+});
+
 router.get("/pdf/:itemNumber", async (req, res) => {
   try {
     const item = await Item.findOne({ item_number: req.params.itemNumber }).populate("customer");

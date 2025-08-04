@@ -20,6 +20,8 @@ services:
       - PORT=4005
       - MONGO_URI=mongodb://mongo:27017/gemsdb
       - CORS_ORIGIN=http://18.60.181.218:4004
+    volumes:
+      - gem-pdfs:/app     
     depends_on:
       - mongo
 
@@ -34,4 +36,5 @@ services:
       - mongo_data:/data/db
 
 volumes:
+  gem-pdfs:   
   mongo_data:

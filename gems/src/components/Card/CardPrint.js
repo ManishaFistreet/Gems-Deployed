@@ -7,7 +7,7 @@ import axios from 'axios';
 import debounce from 'lodash.debounce';
 import html2pdf from 'html2pdf.js';
 
-const baseURL = process.env.REACT_APP_API_BASE || 'http://localhost:5000/api';
+const baseURL = process.env.REACT_APP_API_BASE;
 
 const gemFields = {
   gemstone: {
@@ -43,44 +43,51 @@ export default function CardPrint() {
       filename: `${selectedType.toUpperCase()}Card-${data.name || 'certificate'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format:'A4', orientation: 'portrait' }
+      jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(element).save();
+    html2pdf().set(opt).from(element).outputPdf('blob').then(async (pdfBlob) => {
+      const formData = new FormData();
+      formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
+
+      await axios.post(`${baseURL}/upload-pdf`, formData);
+    });
+
   };
 
-const handleSave = async () => {
-  try {
-    // Check if the certificateNo already exists
-    const existing = await axios.get(
-      `${baseURL}/products/by-certificate/${data.certificateNo}`
-    );
+  const handleSave = async () => {
+    try {
+      // Check if the certificateNo already exists
+      const existing = await axios.get(
+        `${baseURL}/products/by-certificate/${data.certificateNo}`
+      );
 
-    if (existing.data) {
-      alert("Certificate Number already exists. Cannot save duplicate entry.");
-      return;
+      if (existing.data) {
+        alert("Certificate Number already exists. Cannot save duplicate entry.");
+        return;
+      }
+    } catch (err) {
+      if (err.response && err.response.status !== 404) {
+        console.error(err);
+        alert("Error checking for existing certificate number.");
+        return;
+      }
     }
-  } catch (err) {
-    if (err.response && err.response.status !== 404) {
+
+    try {
+      const payload = {
+        type: selectedType,
+        ...data,
+      };
+
+      await axios.post(`${baseURL}/products`, payload);
+      alert("Card saved successfully!");
+    } catch (err) {
       console.error(err);
-      alert("Error checking for existing certificate number.");
-      return;
+      alert("Failed to save card.");
     }
-  }
-
-  try {
-    const payload = {
-      type: selectedType,
-      ...data,
-    };
-
-    await axios.post(`${baseURL}/products`, payload);
-    alert("Card saved successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save card.");
-  }
-};
+  };
 
   useEffect(() => {
     if (data.certificateNo?.length >= 3) {
