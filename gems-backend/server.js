@@ -8,6 +8,7 @@ const itemRoutes = require("./controllers/itemController");
 const salesItemRoutes = require("./routes/salesRoutes");
 const customerItemRoutes = require("./routes/customerRoute");
 const authRoutes = require('./routes/auth');
+const pdfRoutes = require("./routes/pdf");
 
 const app = express();
 const PORT = process.env.PORT || 4005;
@@ -29,6 +30,7 @@ app.use("/api/items", itemRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/sales", salesItemRoutes);       
 app.use("/api/customers", customerItemRoutes);
+app.use("/api", pdfRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
