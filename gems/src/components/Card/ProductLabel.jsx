@@ -3,9 +3,10 @@ import { Box, Typography } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 
 const ProductLabel = React.forwardRef(({ item }, ref) => {
+  const baseurl = process.env.REACT_APP_API_BASE || 'http://localhost:5000/api';
+  const pdfUrl = `${baseurl}/pdf/${item.item_number}`;
   return (
     <Box ref={ref} sx={{ width: "300px", p: 2, border: "1px solid #ccc" }}>
-      {/* Product Image (if exists) */}
       {item.item_pic && (
         <Box mb={1} textAlign="center">
           <img
@@ -26,9 +27,9 @@ const ProductLabel = React.forwardRef(({ item }, ref) => {
       <Typography variant="body2">Weight: {item.net_weight}g</Typography>
       <Typography variant="body2">Rate/gm: ₹{item.metal_rate_per_gram}</Typography>
       <Typography variant="body2">Purity: {item.purity || "N/A"}</Typography>
-     
+
       <Box mt={2} textAlign="center">
-        <QRCodeSVG value={item.item_number || "No-ID"} size={64} />
+        <QRCodeSVG value={pdfUrl} size={64} />
       </Box>
     </Box>
   );

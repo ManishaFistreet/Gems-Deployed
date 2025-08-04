@@ -134,7 +134,7 @@ export default function SavedItemsList({ type, onEdit }) {
         labelValue("City", item.customer.city);
       }
 
-      const qrCodeDataURL = await QRCode.toDataURL(item.item_number || "Unknown");
+      const qrCodeDataURL = await QRCode.toDataURL(`${baseurl}/pdf/${item.item_number}`);
       pdf.text("QR Code:", margin, y);
       pdf.addImage(qrCodeDataURL, "PNG", margin, y + 2, 30, 30);
       y += 35;

@@ -6,6 +6,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 import html2pdf from 'html2pdf.js';
+
 const baseURL = process.env.REACT_APP_API_BASE || 'http://localhost:5000/api';
 
 const gemFields = {
@@ -80,11 +81,6 @@ const handleSave = async () => {
     alert("Failed to save card.");
   }
 };
-
-  const generateQRData = () => {
-    const { photo, ...rest } = data;
-    return JSON.stringify({ type: selectedType, ...rest }, null, 2);
-  };
 
   useEffect(() => {
     if (data.certificateNo?.length >= 3) {
@@ -294,7 +290,7 @@ const handleSave = async () => {
                   )}
 
                   <Box sx={{ textAlign: 'center', mt: 1 }}>
-                    <QRCodeCanvas value={generateQRData()} size={80} />
+                    <QRCodeCanvas value={`${baseURL}/pdf/${data.certificateNo}`} size={80} />
                   </Box>
                 </Box>
               </Grid>
