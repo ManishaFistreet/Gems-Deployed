@@ -12,7 +12,7 @@ const fs = require('fs');
 
 const upload = multer({ dest: '/app/pdfs' });
 
-app.post('/upload-pdf', upload.single('file'), (req, res) => {
+router.post('/upload-pdf', upload.single('file'), (req, res) => {
   const oldPath = req.file.path;
   const newPath = path.join('/app/pdfs', req.file.originalname);
 
