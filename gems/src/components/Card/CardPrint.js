@@ -45,13 +45,27 @@ export default function CardPrint() {
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
     };
-
-    html2pdf().set(opt).from(element).outputPdf('blob').then(async (pdfBlob) => {
+    html2pdf().set(opt).from(element).save().then(() => {
+      const pdfBlob = new Blob([element], { type: 'application/pdf' });
       const formData = new FormData();
       formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
-      await axios.post(`${baseURL}/upload-pdf`, formData);
+      axios.post(`${baseURL}/upload-pdf`, formData)
+        .then(() => {
+          alert('PDF uploaded successfully!');
+        })
+        .catch(err => {
+          console.error('Failed to upload PDF:', err);
+          alert('Failed to upload PDF.');
+        });
     });
   };
+
+  //   html2pdf().set(opt).from(element).outputPdf('blob').then(async (pdfBlob) => {
+  //     const formData = new FormData();
+  //     formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
+  //     await axios.post(`${baseURL}/upload-pdf`, formData);
+  //   });
+  // };
 
   const handleSave = async () => {
     try {
