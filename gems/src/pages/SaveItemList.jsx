@@ -137,8 +137,8 @@ export default function SavedItemsList({ type, onEdit }) {
     }
 
     // Add QR Code (mobile-scannable link to actual PDF)
-    const pdfURL = `${baseurl}/pdf/${item.item_number}.pdf`;
-    const qrCodeDataURL = await QRCode.toDataURL(pdfURL);
+    const qr = `http://18.60.181.218:4005/pdf/${item.item_number}`;
+    const qrCodeDataURL = await QRCode.toDataURL(qr);
     pdf.text("QR Code:", margin, y);
     pdf.addImage(qrCodeDataURL, "PNG", margin, y + 2, 30, 30);
     y += 35;
