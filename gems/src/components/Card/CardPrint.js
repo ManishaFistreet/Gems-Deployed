@@ -46,17 +46,16 @@ export default function CardPrint() {
       jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
     };
 
-    html2pdf()
-      .from(ref.current)
-      .outputPdf("blob")
-      .then(async (pdfBlob) => {
-        const formData = new FormData();
-        formData.append("file", pdfBlob, `${data.certificateNo}.pdf`);
+    html2pdf().set(opt).from(ref.current).outputPdf('blob').then(async (pdfBlob) => {
+      const formData = new FormData();
+      const fileName = `${data.certificateNo}.pdf`;
+      formData.append('file', pdfBlob, fileName);
 
-        await axios.post(`${baseURL}/upload-pdf`, formData);
-        alert("Uploaded to server!");
-      });
+      const response = await axios.post(`${baseURL}/upload-pdf`, formData);
+      const pdfUrl = `${PUBLIC_BASE_URL}${response.data.url}`;
 
+      setQrValue(pdfUrl);
+    });
   };
 
   const handleSave = async () => {
@@ -300,7 +299,7 @@ export default function CardPrint() {
                   )}
 
                   <Box sx={{ textAlign: 'center', mt: 1 }}>
-                    <QRCodeCanvas value={`${baseURL}/pdf/${data.certificateNo}.pdf`} size={80} />
+                    <QRCodeCanvas value={`${baseURL}/pdf/${data.certificateNo}`} size={80} />
                   </Box>
                 </Box>
               </Grid>
