@@ -23,15 +23,9 @@ export default function SavedItemsList({ type, onEdit, items }) {
 
   useEffect(() => {
     const fetchItems = async () => {
-      if (items && items.length > 0) {
-        setSavedItems(items);
-        return;
-      }
       try {
         const endpoint =
           type === "sales" ? `${baseurl}/sales` : `${baseurl}/customers`;
-
-
         const { data } = await axios.get(endpoint);
         setSavedItems(data);
       } catch (err) {

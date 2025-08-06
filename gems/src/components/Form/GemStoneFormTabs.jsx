@@ -15,7 +15,6 @@ import PrintableDetails from "../../components/Card/PrintableDetails";
 export default function GemStoneFormTabs() {
   const [tab, setTab] = useState(0);
   const [savedTypeTab, setSavedTypeTab] = useState(0);
-  const [savedItems, setSavedItems] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const baseURL = process.env.REACT_APP_API_BASE || 'http://localhost:5000/api';
   const initialForm = {
@@ -182,13 +181,6 @@ export default function GemStoneFormTabs() {
     }
   };
 
-useEffect(() => {
-  if (tab === 2) {
-    setSavedItems([]);
-    fetchSavedItems(savedTypeTab === 0 ? "sales" : "customer");
-  }
-}, [tab, savedTypeTab]);
-
   const handleSave = async () => {
     const currentFormData = tab === 0 ? salesFormData : customerFormData;
     const sanitizedData = sanitizeFormData(currentFormData);
@@ -203,8 +195,7 @@ useEffect(() => {
         await axios.put(`${endpoint}/${editIndex}`, sanitizedData);
         alert("Customer item updated successfully!");
       } else {
-        const res = await axios.post(endpoint, sanitizedData);
-        setSavedItems((prev) => [...prev, res.data]);
+        await axios.post(endpoint, sanitizedData);
         alert("Item saved successfully!");
       }
       if (isSales) {
@@ -216,20 +207,6 @@ useEffect(() => {
     } catch (err) {
       console.error("Save failed:", err);
       alert("Failed to save item");
-    }
-  };
-
-  const fetchSavedItems = async (type) => {
-    try {
-      const endpoint =
-        type === "sales"
-          ? `${baseURL}/sales`
-          : `${baseURL}/customers`;
-
-      const res = await axios.get(endpoint);
-      setSavedItems(res.data);
-    } catch (err) {
-      console.error("Failed to load saved entries", err);
     }
   };
 
@@ -305,7 +282,7 @@ useEffect(() => {
           </Tabs>
 
           <SavedItemsList
-            items={savedItems}
+            // items={savedItems}
             onEdit={handleEditItem}
             type={savedTypeTab === 0 ? "sales" : "customer"}
           />
