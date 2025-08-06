@@ -3,11 +3,12 @@ const express = require("express");
 const PDFDocument = require("pdfkit");
 const QRCode = require("qr-image");
 const router = express.Router();
-const Item = require("../models/item");
 const Product = require("../models/product");
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const SalesItem = require("../models/salesItem");
+const CustomerItem = require("../models/customerItem");
 
 const uploadDir = path.join(__dirname, "../pdfs");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -29,43 +30,48 @@ router.post('/upload-pdf', upload.single('file'), (req, res) => {
 });
 
 router.get("/pdf/:itemNumber", async (req, res) => {
-    try {
-        const item = await Item.findOne({ item_number: req.params.itemNumber }).populate("customer");
-        if (!item) return res.status(404).send("Item not found");
+  try {
+    const itemNumber = req.params.itemNumber;
 
-        const doc = new PDFDocument();
-        res.setHeader("Content-Disposition", `inline; filename="${item.item_number}.pdf"`);
-        res.setHeader("Content-Type", "application/pdf");
+    let item =
+      await SalesItem.findOne({ item_number: itemNumber }) ||
+      await CustomerItem.findOne({ item_number: itemNumber });
 
-        doc.fontSize(20).text("Item Label", { align: "left" });
+    if (!item) return res.status(404).send("Item not found");
 
-        doc.moveDown();
-        doc.fontSize(12).text(`Item Name: ${item.item_name}`);
-        doc.text(`Item Number: ${item.item_number}`);
-        doc.text(`Net Weight: ${item.net_weight}`);
-        doc.text(`Gross Weight: ${item.gross_weight}`);
-        doc.text(`Metal Rate: ${item.metal_rate_per_gram}`);
-        doc.text(`Labour Charges: ${item.labour_charges}`);
+    const doc = new PDFDocument();
+    res.setHeader("Content-Disposition", `inline; filename="${itemNumber}.pdf"`);
+    res.setHeader("Content-Type", "application/pdf");
 
-        if (item.customer) {
-            doc.moveDown().fontSize(14).text("Customer Details:");
-            doc.fontSize(12).text(`Name: ${item.customer.name}`);
-            doc.text(`Phone: ${item.customer.phone}`);
-            doc.text(`City: ${item.customer.city}`);
-        }
+    doc.fontSize(20).text("Item Label", { align: "left" });
 
-        doc.moveDown();
-        doc.text("QR Code:");
-        const qr = QRCode.imageSync(item.item_number, { type: "png" });
-        doc.image(qr, doc.x, doc.y, { width: 100 });
+    doc.moveDown();
+    doc.fontSize(12).text(`Item Name: ${item.item_name}`);
+    doc.text(`Item Number: ${item.item_number}`);
+    doc.text(`Net Weight: ${item.net_weight}`);
+    doc.text(`Gross Weight: ${item.gross_weight}`);
+    doc.text(`Metal Rate: ${item.metal_rate_per_gram}`);
+    doc.text(`Labour Charges: ${item.labour_charges}`);
 
-        doc.end();
-        doc.pipe(res);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Failed to generate PDF");
+    if (item.customer) {
+      doc.moveDown().fontSize(14).text("Customer Details:");
+      doc.fontSize(12).text(`Name: ${item.customer.name}`);
+      doc.text(`Phone: ${item.customer.phone}`);
+      doc.text(`City: ${item.customer.city}`);
     }
+
+    const qr = QRCode.imageSync(`http://18.60.181.218:4005/pdf/${item.item_number}`, { type: "png" });
+    doc.moveDown().text("QR Code:");
+    doc.image(qr, doc.x, doc.y, { width: 100 });
+
+    doc.end();
+    doc.pipe(res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to generate PDF");
+  }
 });
+
 
 router.get("/pdf/:certificateNo", async (req, res) => {
     try {

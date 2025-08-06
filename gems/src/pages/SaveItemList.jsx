@@ -39,12 +39,19 @@ export default function SavedItemsList({ type, onEdit }) {
   }, [type]);
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+
     try {
-      const endpoint = `${baseurl}/customers/${id}`;
+      const endpoint =
+        type === "sales"
+          ? `${baseurl}/sales/${id}`
+          : `${baseurl}/customers/${id}`;
+
       await axios.delete(endpoint);
       setSavedItems((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
       console.error("Delete failed", err);
+      alert("Failed to delete the item.");
     }
   };
 
@@ -76,91 +83,91 @@ export default function SavedItemsList({ type, onEdit }) {
   };
 
   const handleDownloadPDF = async (item) => {
-  const pdf = new jsPDF();
-  const margin = 10;
-  let y = margin;
-  const rightX = 140;
-  const imageWidth = 50;
-  const imageHeight = 50;
-  const topRightY = 10;
+    const pdf = new jsPDF();
+    const margin = 10;
+    let y = margin;
+    const rightX = 140;
+    const imageWidth = 50;
+    const imageHeight = 50;
+    const topRightY = 10;
 
-  const labelValue = (label, value) => {
-    pdf.setFont(undefined, "bold");
-    pdf.text(`${label}:`, margin, y);
-    pdf.setFont(undefined, "normal");
-    pdf.text(`${value || "-"}`, margin + 45, y);
-    y += 7;
+    const labelValue = (label, value) => {
+      pdf.setFont(undefined, "bold");
+      pdf.text(`${label}:`, margin, y);
+      pdf.setFont(undefined, "normal");
+      pdf.text(`${value || "-"}`, margin + 45, y);
+      y += 7;
+    };
+
+    try {
+      // Top-right image
+      if (item.item_pic) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = item.item_pic;
+
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve(null);
+          img.onerror = reject;
+        });
+
+        pdf.addImage(img, "JPEG", rightX, topRightY, imageWidth, imageHeight);
+      }
+
+      // Barcode
+      const barcodeDataURL = await generateBarcode(item.item_number || "000000");
+      const barcodeY = topRightY + imageHeight + 10;
+      pdf.text("Barcode:", rightX, barcodeY - 3);
+      pdf.addImage(barcodeDataURL, "PNG", rightX, barcodeY, 60, 30);
+
+      // Header
+      pdf.setFontSize(14);
+      pdf.text("Item Label", margin, y);
+      y += 10;
+
+      // Fields
+      labelValue("Item Name", item.item_name);
+      labelValue("Item Number", item.item_number);
+      labelValue("Net Weight", item.net_weight);
+      labelValue("Gross Weight", item.gross_weight);
+      labelValue("Metal Rate", item.metal_rate_per_gram);
+      labelValue("Labour Charges", item.labour_charges);
+
+      if (item.customer) {
+        y += 5;
+        pdf.setFontSize(13);
+        pdf.text("Customer Details", margin, y);
+        y += 8;
+        labelValue("Name", item.customer.name);
+        labelValue("Phone", item.customer.phone);
+        labelValue("City", item.customer.city);
+      }
+
+      // Add QR Code (mobile-scannable link to actual PDF)
+      const qr = `http://18.60.181.218:4005/pdf/${item.item_number}`;
+      const qrCodeDataURL = await QRCode.toDataURL(qr);
+      pdf.text("QR Code:", margin, y);
+      pdf.addImage(qrCodeDataURL, "PNG", margin, y + 2, 30, 30);
+      y += 35;
+
+      // Export to Blob
+      const pdfBlob = pdf.output("blob");
+
+      // Upload
+      const formData = new FormData();
+      formData.append("file", pdfBlob, `${item.item_number}.pdf`);
+
+      await axios.post(`${baseurl}/upload-pdf`, formData);
+
+      // Save PDF locally too
+      pdf.save(`${item.item_number || "label"}.pdf`);
+
+      alert("PDF generated and uploaded successfully!");
+    } catch (err) {
+      console.error("PDF generation/upload failed", err);
+      alert("Failed to generate or upload PDF.");
+    }
   };
-
-  try {
-    // Top-right image
-    if (item.item_pic) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = item.item_pic;
-
-      await new Promise((resolve, reject) => {
-        img.onload = () => resolve(null);
-        img.onerror = reject;
-      });
-
-      pdf.addImage(img, "JPEG", rightX, topRightY, imageWidth, imageHeight);
-    }
-
-    // Barcode
-    const barcodeDataURL = await generateBarcode(item.item_number || "000000");
-    const barcodeY = topRightY + imageHeight + 10;
-    pdf.text("Barcode:", rightX, barcodeY - 3);
-    pdf.addImage(barcodeDataURL, "PNG", rightX, barcodeY, 60, 30);
-
-    // Header
-    pdf.setFontSize(14);
-    pdf.text("Item Label", margin, y);
-    y += 10;
-
-    // Fields
-    labelValue("Item Name", item.item_name);
-    labelValue("Item Number", item.item_number);
-    labelValue("Net Weight", item.net_weight);
-    labelValue("Gross Weight", item.gross_weight);
-    labelValue("Metal Rate", item.metal_rate_per_gram);
-    labelValue("Labour Charges", item.labour_charges);
-
-    if (item.customer) {
-      y += 5;
-      pdf.setFontSize(13);
-      pdf.text("Customer Details", margin, y);
-      y += 8;
-      labelValue("Name", item.customer.name);
-      labelValue("Phone", item.customer.phone);
-      labelValue("City", item.customer.city);
-    }
-
-    // Add QR Code (mobile-scannable link to actual PDF)
-    const qr = `http://18.60.181.218:4005/pdf/${item.item_number}`;
-    const qrCodeDataURL = await QRCode.toDataURL(qr);
-    pdf.text("QR Code:", margin, y);
-    pdf.addImage(qrCodeDataURL, "PNG", margin, y + 2, 30, 30);
-    y += 35;
-
-    // Export to Blob
-    const pdfBlob = pdf.output("blob");
-
-    // Upload
-    const formData = new FormData();
-    formData.append("file", pdfBlob, `${item.item_number}.pdf`);
-
-    await axios.post(`${baseurl}/upload-pdf`, formData);
-
-    // Save PDF locally too
-    pdf.save(`${item.item_number || "label"}.pdf`);
-
-    alert("PDF generated and uploaded successfully!");
-  } catch (err) {
-    console.error("PDF generation/upload failed", err);
-    alert("Failed to generate or upload PDF.");
-  }
-};
 
   // const handleDownloadPDF = async (item) => {
   //   const pdf = new jsPDF();
