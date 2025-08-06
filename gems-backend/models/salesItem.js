@@ -9,8 +9,15 @@ const stoneSchema = new mongoose.Schema({
 });
 
 const salesItemSchema = new mongoose.Schema({
-  item_number: String,
-  item_name: String,
+  item_number: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  item_name: {
+    type: String,
+    required: true,
+  },
   size: String,
   metal: String,
   purity: String,

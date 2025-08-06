@@ -17,40 +17,53 @@ export default function PrintableDetails({ formData, type }) {
     stones = [],
   } = formData;
 
+  if (!item_name || !item_number) {
+    return (
+      <Box p={3} sx={{ fontSize: "20px", color: "#f00" }}>
+        <Typography variant="h6">No details available</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box p={3} sx={{ fontSize: "30px", color: "#000", width: "100%" }}>
       <Typography variant="h4" gutterBottom>{type === "sales" ? "Sales Details" : "Customer Details"}</Typography>
       <Divider sx={{ my: 2 }} />
 
-      <Typography sx={{fontSize:"30px"}}><strong>Item Name:</strong> {item_name}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Item Number:</strong> {item_number}</Typography>
+      <Typography sx={{ fontSize: "30px", color: !item_name ? "red" : "inherit" }}>
+        <strong>Item Name:</strong> {item_name || "Required"}
+      </Typography>
+
+      <Typography sx={{ fontSize: "30px", color: !item_name ? "red" : "inherit" }}>
+        <strong>Item Number:</strong> {item_number || "Required"}
+      </Typography>
 
       <Divider sx={{ my: 2 }} />
 
-      <Typography sx={{fontSize:"30px"}}><strong>Gross Weight:</strong> {gross_weight}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Weight Adjustment:</strong> {weight_adjustment}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Net Weight:</strong> {net_weight}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Metal Rate/gm:</strong> {metal_rate_per_gram}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Gross Weight:</strong> {gross_weight}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Weight Adjustment:</strong> {weight_adjustment}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Net Weight:</strong> {net_weight}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Metal Rate/gm:</strong> {metal_rate_per_gram}</Typography>
 
       <Divider sx={{ my: 2 }} />
 
-      <Typography sx={{fontSize:"30px"}}><strong>Labour Charges:</strong> {labour_charges}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Kundan:</strong> {kundan}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Beads:</strong> {beads}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Hallmark:</strong> {hallmark}</Typography>
-      <Typography sx={{fontSize:"30px"}}><strong>Additional Charges:</strong> {additional_charges}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Labour Charges:</strong> {labour_charges}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Kundan:</strong> {kundan}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Beads:</strong> {beads}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Hallmark:</strong> {hallmark}</Typography>
+      <Typography sx={{ fontSize: "30px" }}><strong>Additional Charges:</strong> {additional_charges}</Typography>
 
       {stones.length > 0 && (
         <>
           <Divider sx={{ my: 2 }} />
-          <Typography sx={{fontSize:"30px"}} variant="h6">Stones</Typography>
+          <Typography sx={{ fontSize: "30px" }} variant="h6">Stones</Typography>
           {stones.map((stone, index) => (
             <Box key={index} sx={{ mb: 1 }}>
-              <Typography sx={{fontSize:"30px"}}><strong>Name:</strong> {stone.name}</Typography>
-              <Typography sx={{fontSize:"30px"}}><strong>Category:</strong> {stone.category}</Typography>
-              <Typography sx={{fontSize:"30px"}}><strong>Weight:</strong> {stone.weight}</Typography>
-              <Typography sx={{fontSize:"30px"}}><strong>Quantity:</strong> {stone.quantity}</Typography>
-              <Typography sx={{fontSize:"30px"}}><strong>Price:</strong> {stone.price}</Typography>
+              <Typography sx={{ fontSize: "30px" }}><strong>Name:</strong> {stone.name}</Typography>
+              <Typography sx={{ fontSize: "30px" }}><strong>Category:</strong> {stone.category}</Typography>
+              <Typography sx={{ fontSize: "30px" }}><strong>Weight:</strong> {stone.weight}</Typography>
+              <Typography sx={{ fontSize: "30px" }}><strong>Quantity:</strong> {stone.quantity}</Typography>
+              <Typography sx={{ fontSize: "30px" }}><strong>Price:</strong> {stone.price}</Typography>
               <Divider sx={{ my: 1 }} />
             </Box>
           ))}
