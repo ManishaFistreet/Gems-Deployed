@@ -60,13 +60,6 @@ export default function CardPrint() {
     });
   };
 
-  //   html2pdf().set(opt).from(element).outputPdf('blob').then(async (pdfBlob) => {
-  //     const formData = new FormData();
-  //     formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
-  //     await axios.post(`${baseURL}/upload-pdf`, formData);
-  //   });
-  // };
-
   const handleSave = async () => {
     try {
       const existing = await axios.get(
@@ -122,7 +115,6 @@ export default function CardPrint() {
       return () => fetchData.cancel?.();
     }
   }, [data.certificateNo]);
-
 
   return (
     <Box p={5}>
@@ -198,10 +190,8 @@ export default function CardPrint() {
 
       </Paper>
 
-      {/* This is the content that will be printed */}
       <div ref={ref}>
         <Paper
-          // ref={ref}
           elevation={3}
           sx={{
             width: '100%',
@@ -307,7 +297,7 @@ export default function CardPrint() {
                   )}
 
                   <Box sx={{ textAlign: 'center', mt: 1 }}>
-                    <QRCodeCanvas value={`${baseURL}/pdf/${data.certificateNo}`} size={80} />
+                    <QRCodeCanvas value={`http://18.60.181.218:4005/pdf/${data.certificateNo}.pdf`} />
                   </Box>
                 </Box>
               </Grid>
