@@ -109,9 +109,9 @@ export default function SavedItemsList({ type, onEdit }) {
 
     // Barcode
     const barcodeDataURL = await generateBarcode(item.item_number || "000000");
-    const barcodeY = topRightY + imageHeight + 5;
+    const barcodeY = topRightY + imageHeight + 10;
     pdf.text("Barcode:", rightX, barcodeY - 3);
-    pdf.addImage(barcodeDataURL, "PNG", rightX, barcodeY, 60, 50);
+    pdf.addImage(barcodeDataURL, "PNG", rightX, barcodeY, 60, 30);
 
     // Header
     pdf.setFontSize(14);
