@@ -38,17 +38,23 @@ export default function CardPrint() {
 
   const handleDownloadPDF = () => {
     const element = ref.current;
+
     const opt = {
       margin: 0.5,
       filename: `${selectedType.toUpperCase()}Card-${data.name || 'certificate'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
+      jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
     };
-    html2pdf().set(opt).from(element).save().then(() => {
-      const pdfBlob = new Blob([element], { type: 'application/pdf' });
+
+    html2pdf().set(opt).from(element).outputPdf('blob').then((pdfBlob) => {
+      // Trigger download for user
+      html2pdf().set(opt).from(element).save();
+
+      // Then upload
       const formData = new FormData();
       formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
+
       axios.post(`${baseURL}/upload-pdf`, formData)
         .then(() => {
           alert('PDF uploaded successfully!');
