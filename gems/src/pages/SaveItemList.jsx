@@ -23,7 +23,7 @@ export default function SavedItemsList({ type, onEdit, items }) {
 
   useEffect(() => {
     const fetchItems = async () => {
-       if (items && items.length > 0) {
+      if (items && items.length > 0) {
         setSavedItems(items);
         return;
       }

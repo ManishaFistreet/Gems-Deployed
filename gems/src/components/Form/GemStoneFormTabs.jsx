@@ -182,12 +182,12 @@ export default function GemStoneFormTabs() {
     }
   };
 
-  useEffect(() => {
-    if (tab === 2) {
-      const type = savedTypeTab === 0 ? "sales" : "customer";
-      fetchSavedItems(type);
-    }
-  }, [tab, savedTypeTab]);
+useEffect(() => {
+  if (tab === 2) {
+    setSavedItems([]);
+    fetchSavedItems(savedTypeTab === 0 ? "sales" : "customer");
+  }
+}, [tab, savedTypeTab]);
 
   const handleSave = async () => {
     const currentFormData = tab === 0 ? salesFormData : customerFormData;
