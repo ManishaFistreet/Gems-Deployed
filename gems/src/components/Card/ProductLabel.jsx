@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 const ProductLabel = React.forwardRef(({ item }, ref) => {
   const baseurl = process.env.REACT_APP_API_BASE || 'http://localhost:5000/api';
-  const pdfUrl = `${baseurl}/pdf/${item.item_number}`;
+  const pdfUrl = `${baseurl}/pdf/${item.item_number}.pdf`;
   return (
     <Box ref={ref} sx={{ width: "300px", p: 2, border: "1px solid #ccc" }}>
       {item.item_pic && (

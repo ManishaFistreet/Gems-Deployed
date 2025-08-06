@@ -31,7 +31,8 @@ app.use('/api/auth', authRoutes);
 app.use("/api/sales", salesItemRoutes);       
 app.use("/api/customers", customerItemRoutes);
 app.use("/api", pdfRoutes);
-app.use('/pdf', express.static('/app/pdfs'));
+app.use("/pdf", express.static(path.join(__dirname, "pdfs")));
+app.use("/", pdfRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
