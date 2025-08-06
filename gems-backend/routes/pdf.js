@@ -10,11 +10,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const upload = multer({ dest: '/app' });
+const upload = multer({ dest: '/app/pdfs' });
 
 app.post('/upload-pdf', upload.single('file'), (req, res) => {
   const oldPath = req.file.path;
-  const newPath = path.join('/app', req.file.originalname);
+  const newPath = path.join('/app/pdfs', req.file.originalname);
 
   fs.rename(oldPath, newPath, err => {
     if (err) return res.status(500).send("Failed to save");
