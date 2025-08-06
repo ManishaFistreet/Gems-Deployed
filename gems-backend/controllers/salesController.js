@@ -43,15 +43,19 @@ exports.updateSalesItem = async (req, res) => {
 
 exports.deleteSalesItem = async (req, res) => {
   try {
-    const item = await SalesItem.findByIdAndDelete(req.params.id);
-    if (!item) return res.status(404).json({ error: "Item not found" });
-    const pdfPath = path.join(__dirname, "../pdfs", `${item.item_number}.pdf`);
+    const deletedItem = await SalesItem.findByIdAndDelete(req.params.id);
+
+    if (!deletedItem) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    // Delete associated PDF file
+    const pdfPath = path.join(__dirname, "../pdfs", `${deletedItem.item_number}.pdf`);
     if (fs.existsSync(pdfPath)) {
       fs.unlinkSync(pdfPath);
-      console.log(`Deleted PDF: ${item.item_number}.pdf`);
     }
-    res.json({ message: "Item deleted successfully" });
+
+    res.status(200).json({ message: "Sales item and PDF deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
-};
+  }};
