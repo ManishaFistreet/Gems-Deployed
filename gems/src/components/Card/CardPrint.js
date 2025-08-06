@@ -46,21 +46,15 @@ export default function CardPrint() {
       jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(ref.current).outputPdf('blob').then(async (pdfBlob) => {
+    html2pdf().set(opt).from(element).outputPdf('blob').then(async (pdfBlob) => {
       const formData = new FormData();
-      const fileName = `${data.certificateNo}.pdf`;
-      formData.append('file', pdfBlob, fileName);
-
-      const response = await axios.post(`${baseURL}/upload-pdf`, formData);
-      const pdfUrl = `${PUBLIC_BASE_URL}${response.data.url}`;
-
-      setQrValue(pdfUrl);
+      formData.append('file', pdfBlob, `${data.certificateNo}.pdf`);
+      await axios.post(`${baseURL}/upload-pdf`, formData);
     });
   };
 
   const handleSave = async () => {
     try {
-      // Check if the certificateNo already exists
       const existing = await axios.get(
         `${baseURL}/products/by-certificate/${data.certificateNo}`
       );
